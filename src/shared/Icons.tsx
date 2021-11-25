@@ -4,7 +4,7 @@ interface IconProps {
 	className: string;
 }
 
-export function SortIcon({ className }: IconProps) {
+export function SortIcon({ className }: IconProps): JSX.Element {
 	return (
 		<svg
 			className={className}
@@ -20,7 +20,7 @@ export function SortIcon({ className }: IconProps) {
 	);
 }
 
-export function SortUpIcon({ className }: IconProps) {
+export function SortUpIcon({ className }: IconProps): JSX.Element {
 	return (
 		<svg
 			className={className}
@@ -36,7 +36,7 @@ export function SortUpIcon({ className }: IconProps) {
 	);
 }
 
-export function SortDownIcon({ className }: IconProps) {
+export function SortDownIcon({ className }: IconProps): JSX.Element {
 	return (
 		<svg
 			className={className}

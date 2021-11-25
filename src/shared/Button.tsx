@@ -2,11 +2,13 @@ import React from 'react';
 import { classNames } from './Utils';
 
 interface ButtonProps {
-	children: React.ReactChild | React.ReactChildren;
-	className: string;
+	children: React.ReactChild[] | React.ReactChildren[] | React.ReactChild | React.ReactChildren;
+	className?: string;
+	onClick?: () => void;
+	disabled?: boolean;
 }
 
-export function Button({ children, className, ...rest }: ButtonProps) {
+export function Button({ children, className = '', ...rest }: ButtonProps): JSX.Element {
 	return (
 		<button
 			type='button'
@@ -20,7 +22,7 @@ export function Button({ children, className, ...rest }: ButtonProps) {
 	);
 }
 
-export function PageButton({ children, className, ...rest }: ButtonProps) {
+export function PageButton({ children, className = '', ...rest }: ButtonProps): JSX.Element {
 	return (
 		<button
 			type='button'
