@@ -23,10 +23,16 @@ import { Button, PageButton } from './shared/Button';
 import { classNames } from './shared/Utils';
 import { SortIcon, SortUpIcon, SortDownIcon } from './shared/Icons';
 import { AnyMxRecord } from 'dns';
-import { ColumnProps, PersonData } from './App';
+import { PersonData } from './api/api';
+
+type ColumnPropsType = {
+	preGlobalFilteredRows: any;
+	globalFilter: any;
+	setGlobalFilter: any;
+};
 
 // Define a default UI for filtering
-function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter }): JSX.Element {
+function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter }: ColumnPropsType): JSX.Element {
 	const count = preGlobalFilteredRows.length;
 	const [value, setValue] = React.useState(globalFilter);
 	const onChange = useAsyncDebounce(value => {
@@ -52,12 +58,24 @@ function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter }):
 
 // This is a custom filter UI for selecting
 // a unique option from a list
-export function SelectColumnFilter({ column: { filterValue, setFilter, preFilteredRows, id, render } }) {
+type setGlobalFilterType = {
+	column: {
+		filterValue: any;
+		setFilter: any;
+		preFilteredRows: any;
+		id: any;
+		render: any;
+	};
+};
+
+export function SelectColumnFilter({
+	column: { filterValue, setFilter, preFilteredRows, id, render },
+}: setGlobalFilterType) {
 	// Calculate the options for filtering
 	// using the preFilteredRows
 	const options = React.useMemo(() => {
-		const options = new Set();
-		preFilteredRows.forEach(row => {
+		const options: any = new Set();
+		preFilteredRows.forEach((row: any) => {
 			options.add(row.values[id]);
 		});
 		return [...options.values()];
@@ -102,7 +120,7 @@ export function StatusPill({ value }: { value: string }): JSX.Element {
 	);
 }
 
-export function AvatarCell({ value, column, row }: { value: string; column: ColumnProps; row: any }) {
+export function AvatarCell({ value, column, row }: { value: string; column: any; row: any }) {
 	return (
 		<div className='flex items-center'>
 			<div className='flex-shrink-0 h-10 w-10'>
@@ -116,29 +134,20 @@ export function AvatarCell({ value, column, row }: { value: string; column: Colu
 	);
 }
 
-// Required workaround for missing TypesScript definitions.
-// Will be fixed in react-table v8
-// see also https://github.com/tannerlinsley/react-table/issues/3064
-type TableTypeWorkaround<T extends Object> = TableInstance<T> & {
-	gotoPage: (index: number) => void;
-	state: {
-		pageIndex: number;
-		pageSize: number;
-	};
-	pageCount: number;
-	setPageSize: any;
-	page: any;
-	canPreviousPage: any;
-	pageOptions: any;
-	canNextPage: any;
-	nextPage: any;
-	previousPage: any;
-	preGlobalFilteredRows: any;
-	setGlobalFilter: any;
-};
-
 function Table<T extends Record<string, unknown>>({ columns, data }: PropsWithChildren<TableOptions<T>>) {
 	// Use the state and functions returned from useTable to build your UI
+
+	const tableInstance = useTable<T>(
+		{
+			columns,
+			data,
+		},
+		useFilters, // useFilters!
+		useGlobalFilter,
+		useSortBy,
+		usePagination // new
+	);
+
 	const {
 		getTableProps,
 		getTableBodyProps,
@@ -160,16 +169,7 @@ function Table<T extends Record<string, unknown>>({ columns, data }: PropsWithCh
 		state,
 		preGlobalFilteredRows,
 		setGlobalFilter,
-	} = useTable<T>(
-		{
-			columns,
-			data,
-		},
-		useFilters, // useFilters!
-		useGlobalFilter,
-		useSortBy,
-		usePagination // new
-	) as TableTypeWorkaround<T>;
+	} = tableInstance;
 
 	// Render the UI for your table
 	return (
@@ -235,6 +235,7 @@ function Table<T extends Record<string, unknown>>({ columns, data }: PropsWithCh
 												{row.cells.map(cell => {
 													return (
 														<td {...cell.getCellProps()} className='px-6 py-4 whitespace-nowrap' role='cell'>
+															{/* @ts-ignore //FIXME: */}
 															{cell.column.Cell.name === 'defaultRenderer' ? (
 																<div className='text-sm text-gray-500'>{cell.render('Cell')}</div>
 															) : (
