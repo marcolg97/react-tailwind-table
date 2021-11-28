@@ -1,7 +1,7 @@
 import React from 'react';
 import { Column } from 'react-table';
 import { getData, PersonData } from './api/api';
-import Table from './Table';
+import Table from './table/Table';
 import { columnsStructure } from './table/Columns';
 
 function App(): JSX.Element {
